@@ -1,0 +1,23 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-amplify760644940d134-staging-162942-authRole",
+      "UnauthRoleArn": "arn:aws:iam::381491933442:role/amplify-amplify760644940d134-staging-162942-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::381491933442:role/amplify-amplify760644940d134-staging-162942-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-amplify760644940d134-staging-162942-deployment",
+      "UnauthRoleName": "amplify-amplify760644940d134-staging-162942-unauthRole",
+      "StackName": "amplify-amplify760644940d134-staging-162942",
+      "StackId": "arn:aws:cloudformation:us-east-2:381491933442:stack/amplify-amplify760644940d134-staging-162942/f1d8d3d0-bb9e-11ee-a17e-0aa989d96e01",
+      "AmplifyAppId": "d2w7ajm0pso2iy"
+    },
+    "categories": {
+      "auth": {
+        "spotifysongskiptrack2a7a5e8d": {}
+      },
+      "api": {
+        "spotifysongskiptrack": {}
+      }
+    }
+  }
+}
