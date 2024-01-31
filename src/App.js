@@ -17,25 +17,28 @@ import {
 } from "@aws-amplify/ui-react";
 import { generateClient } from 'aws-amplify/api';
 import { uploadData, getUrl, remove }  from 'aws-amplify/storage';
+import { redirectToAuth, getAccessToken } from "./authHelpers";
 
 const client = generateClient();
+const clientId = "e6fb6e00e14f4df2b11fd3c6bd3985f3";
+const params = new URLSearchParams(window.location.search);
+const code = params.get("code");
+let accessToken = localStorage.getItem("accessToken");
+console.log(accessToken);
+if (!code) {
+  redirectToAuth(clientId);
+} else {
+  accessToken = await getAccessToken(clientId, code);
+}
 
 const App = ({ signOut }) => {
-
-  const [showProfile, setShowProfile] = useState(false);
-
-  const buttonClick = () => {
-    console.log("click");
-    setShowProfile(!showProfile);
-  };
-
+  accessToken = localStorage.getItem("accessToken");
   return (
     <ThemeProvider>
       <View className="App">
         <Heading level={1}>Spotify Profile Test</Heading>
-        <Text>New Text <Button variation="primary" onClick={buttonClick}>Push</Button></Text>
-        { showProfile &&
-              <SpotifyProfile/>
+        { accessToken &&
+              <SpotifyProfile token={accessToken} />
         }
       </View>
     </ThemeProvider>

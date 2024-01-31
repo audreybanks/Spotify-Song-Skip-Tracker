@@ -12,13 +12,36 @@ import {
   ThemeProvider,
 } from "@aws-amplify/ui-react";
 
-const SpotifyProfile = () => {
+const SpotifyProfile = token => {
+    const [profile, setProfile] = useState();
+
+    useEffect(() => {
+        getProfileData(token).then(data => {
+            console.log(data);
+            setProfile(data);
+        });
+    }, [token]);
 
     return (
         <View>
-            <Heading level={3}>Profile</Heading>
+            {(profile && !profile.error) &&             <View>
+                <Heading level={3}>{profile.display_name}'s Profile</Heading>
+                <Text>User ID: {profile.id}</Text>
+                <Text>User Email: {profile.email}</Text>
+                <Text>Spotify URI: {profile.uri}</Text>
+                <Text>User Link: {profile.external_urls.spotify}</Text>
+                <Image src={profile.images[0]}/>
+            </View>}
         </View>
     );
+};
+
+const getProfileData = async token => {
+    const result = await fetch("https://api.spotify.com/v1/me", {
+        method: "GET", headers: { Authorization: `Bearer ${token.token}` }
+    });
+
+    return await result.json();
 };
 
 export default SpotifyProfile;
