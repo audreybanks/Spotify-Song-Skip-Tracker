@@ -15,11 +15,11 @@
       "auth": {
         "spotifysongskiptrack2a7a5e8d": {}
       },
-      "api": {
-        "spotifysongskiptrack": {}
-      },
       "storage": {
         "imageStorage": {}
+      },
+      "api": {
+        "spotifysongskiptrack": {}
       }
     }
   }
