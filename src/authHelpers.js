@@ -1,5 +1,20 @@
-import { useState } from "react";
+//TODO: Move all auth code and handling to this file and call helpers
 
+const clientId = "e6fb6e00e14f4df2b11fd3c6bd3985f3";
+let accessToken = localStorage.getItem("accessToken") == 'undefined' ? null : localStorage.getItem("accessToken");
+
+export const handleAuth = async () => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (!code) {
+        redirectToAuth(clientId);
+    } else {
+        accessToken = await getAccessToken(clientId, code);
+    }
+    //get Promise back from getAccessToken and handle setting/rejection here
+}
+
+// TODO make a Promise to reject on error
 export const redirectToAuth = async (clientId) => {
     const verifier = generateCodeVerifier(128);
     const code = await generateCodeChallenge(verifier);
@@ -17,6 +32,7 @@ export const redirectToAuth = async (clientId) => {
     document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
 };
 
+// TODO make a Promise to reject on error
 export const getAccessToken = async (clientId, code) => {
     const verifier = localStorage.getItem("verifier");
 
@@ -34,9 +50,15 @@ export const getAccessToken = async (clientId, code) => {
         },
         body: params
     });
+    //Check status of result, if 4xx reject
 
-    const { access_token } = await result.json();
+    console.log(result);
+    const resultJson = await result.json();
+    console.log(resultJson);
+    const { access_token, expires_in, refresh_token } = resultJson;
     localStorage.setItem("accessToken", access_token);
+    localStorage.setItem("expiresIn", expires_in);
+    localStorage.setItem("refreshToken", refresh_token);
     return access_token;
 };
 
