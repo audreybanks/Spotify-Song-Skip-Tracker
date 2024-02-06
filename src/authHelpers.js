@@ -39,14 +39,12 @@ export const getToken = async (clientId, code, isRefresh = false) => {
 
     if (isRefresh) {
         const refreshToken = localStorage.getItem("refreshToken");
-        console.log("getting refresh token");
 
         params.append("grant_type", "refresh_token");
         params.append("refresh_token", refreshToken);
         params.append("client_id", clientId);
     } else {
         const verifier = localStorage.getItem("verifier");
-        console.log("getting access token");
 
         params.append("client_id", clientId);
         params.append("grant_type", "authorization_code");
@@ -64,13 +62,16 @@ export const getToken = async (clientId, code, isRefresh = false) => {
     });
 
     const resultJson = await result.json();
-    // console.log(resultJson);
+
     const { access_token, expires_in, refresh_token } = resultJson;
     if (!resultJson.error) {
         expireDate.setSeconds(expireDate.getSeconds() + parseInt(expires_in));
         localStorage.setItem("accessToken", access_token);
         localStorage.setItem("expiresDate", expireDate);
         localStorage.setItem("refreshToken", refresh_token);
+
+        const tokenEvent = new Event("tokenUpdate");
+        window.dispatchEvent(tokenEvent);
     }
 }
 

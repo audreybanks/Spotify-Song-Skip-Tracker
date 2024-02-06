@@ -48,8 +48,6 @@ const getProfileData = async token => {
     });
 
     const profileData = await result.json();
-    console.log(profileData)
-
     return profileData;
 };
 

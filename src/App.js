@@ -17,18 +17,25 @@ import {
 } from "@aws-amplify/ui-react";
 import { generateClient } from 'aws-amplify/api';
 import { uploadData, getUrl, remove }  from 'aws-amplify/storage';
-import { handleAuth, getRefreshToken } from "./authHelpers";
+import { handleAuth } from "./authHelpers";
 
 const client = generateClient();
 
-// if (localStorage.getItem("accessToken") === 'undefined') {
-//   handleAuth();
-// }
-
 const App = ({ signOut }) => {
   //TODO eventListener useState accessToken to check when accessToken aquired
-  // const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
-  const accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
+  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
+  useEffect(() => {
+    const updateToken = () => {
+      setAccessToken(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
+    };
+
+    window.addEventListener("tokenUpdate", updateToken);
+
+    return () => {
+      window.removeEventListener("tokenUpdate", updateToken);
+    }
+  }, []);
+  // const accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
   return (
     <ThemeProvider>
       <View className="App">
