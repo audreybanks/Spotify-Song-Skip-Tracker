@@ -21,29 +21,21 @@ import { handleAuth, getRefreshToken } from "./authHelpers";
 
 const client = generateClient();
 
-// const clientId = "e6fb6e00e14f4df2b11fd3c6bd3985f3";
-// let accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
-// const params = new URLSearchParams(window.location.search);
-// const code = params.get("code");
-// console.log(accessToken);
-// if (!code) {
-//   redirectToAuth(clientId);
-// } else {
-//   accessToken = await getAccessToken(clientId, code);
+// if (localStorage.getItem("accessToken") === 'undefined') {
+//   handleAuth();
 // }
-// let accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
-if (localStorage.getItem("accessToken") === 'undefined') {
-  handleAuth();
-}
 
 const App = ({ signOut }) => {
   //TODO eventListener useState accessToken to check when accessToken aquired
-  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
-
+  // const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
+  const accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
   return (
     <ThemeProvider>
       <View className="App">
         <Heading level={1}>Spotify Profile Test</Heading>
+        { !accessToken &&
+          <Button onClick={() => { handleAuth() }}>Sign into Spotify</Button>
+        }
         { accessToken &&
               <SpotifyProfile token={accessToken} />
         }

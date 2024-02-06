@@ -11,7 +11,7 @@ import {
   withAuthenticator,
   ThemeProvider,
 } from "@aws-amplify/ui-react";
-import { getToken } from "./authHelpers";
+import { handleAuth } from "./authHelpers";
 
 const SpotifyProfile = token => {
     const [profile, setProfile] = useState();
@@ -20,7 +20,7 @@ const SpotifyProfile = token => {
         getProfileData(token).then(data => {
             setProfile(data);
         });
-    }, [token]);
+    }, []);
 
     return (
         <View>
@@ -39,8 +39,8 @@ const SpotifyProfile = token => {
 const getProfileData = async token => {
     //check if token is expired before each API call
     const expiresDate = new Date(Date.parse(localStorage.getItem("expiresDate")));
-    if (Date.now() < expiresDate) {
-        getToken({isRefresh: true})
+    if (Date.now() > expiresDate) {
+        handleAuth(true);
     }
 
     const result = await fetch("https://api.spotify.com/v1/me", {
