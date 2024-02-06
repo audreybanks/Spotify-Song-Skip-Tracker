@@ -11,13 +11,13 @@ import {
   withAuthenticator,
   ThemeProvider,
 } from "@aws-amplify/ui-react";
+import { getToken } from "./authHelpers";
 
 const SpotifyProfile = token => {
     const [profile, setProfile] = useState();
 
     useEffect(() => {
         getProfileData(token).then(data => {
-            console.log(data);
             setProfile(data);
         });
     }, [token]);
@@ -37,11 +37,20 @@ const SpotifyProfile = token => {
 };
 
 const getProfileData = async token => {
+    //check if token is expired before each API call
+    const expiresDate = new Date(Date.parse(localStorage.getItem("expiresDate")));
+    if (Date.now() < expiresDate) {
+        getToken({isRefresh: true})
+    }
+
     const result = await fetch("https://api.spotify.com/v1/me", {
         method: "GET", headers: { Authorization: `Bearer ${token.token}` }
     });
 
-    return await result.json();
+    const profileData = await result.json();
+    console.log(profileData)
+
+    return profileData;
 };
 
 export default SpotifyProfile;

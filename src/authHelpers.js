@@ -9,7 +9,7 @@ export const handleAuth = async () => {
     if (!code) {
         redirectToAuth(clientId);
     } else {
-        accessToken = await getAccessToken(clientId, code);
+        accessToken = await getToken(clientId, code);
     }
     //get Promise back from getAccessToken and handle setting/rejection here
 }
@@ -32,16 +32,26 @@ export const redirectToAuth = async (clientId) => {
     document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
 };
 
-// TODO make a Promise to reject on error
-export const getAccessToken = async (clientId, code) => {
-    const verifier = localStorage.getItem("verifier");
+export const getToken = async (clientId, code, isRefresh = false) => {
 
     const params = new URLSearchParams();
-    params.append("client_id", clientId);
-    params.append("grant_type", "authorization_code");
-    params.append("code", code);
-    params.append("redirect_uri", "http://localhost:3000");
-    params.append("code_verifier", verifier);
+    let expireDate = new Date();
+
+    if (isRefresh) {
+        const refreshToken = localStorage.getItem("refreshToken");
+
+        params.append("grant_type", "refresh_token");
+        params.append("refresh_token", refreshToken);
+        params.append("client_id", clientId);
+    } else {
+        const verifier = localStorage.getItem("verifier");
+
+        params.append("client_id", clientId);
+        params.append("grant_type", "authorization_code");
+        params.append("code", code);
+        params.append("redirect_uri", "http://localhost:3000");
+        params.append("code_verifier", verifier);
+    }
 
     const result = await fetch("https://accounts.spotify.com/api/token", {
         method: "POST",
@@ -50,17 +60,79 @@ export const getAccessToken = async (clientId, code) => {
         },
         body: params
     });
-    //Check status of result, if 4xx reject
 
-    console.log(result);
     const resultJson = await result.json();
-    console.log(resultJson);
+    // console.log(resultJson);
     const { access_token, expires_in, refresh_token } = resultJson;
+    expireDate.setSeconds(expireDate.getSeconds() + parseInt(expires_in));
     localStorage.setItem("accessToken", access_token);
-    localStorage.setItem("expiresIn", expires_in);
+    localStorage.setItem("expiresDate", expireDate);
     localStorage.setItem("refreshToken", refresh_token);
     return access_token;
-};
+}
+
+// // TODO make a Promise to reject on error
+// export const getAccessToken = async (clientId, code) => {
+//     const verifier = localStorage.getItem("verifier");
+
+//     const params = new URLSearchParams();
+//     params.append("client_id", clientId);
+//     params.append("grant_type", "authorization_code");
+//     params.append("code", code);
+//     params.append("redirect_uri", "http://localhost:3000");
+//     params.append("code_verifier", verifier);
+
+//     //Prepare to store expire date for token
+//     let expireDate = new Date();
+
+//     const result = await fetch("https://accounts.spotify.com/api/token", {
+//         method: "POST",
+//         headers: { 
+//             "Content-Type": "application/x-www-form-urlencoded",
+//         },
+//         body: params
+//     });
+//     //Check status of result, if 4xx reject
+
+//     console.log(result);
+//     const resultJson = await result.json();
+//     console.log(resultJson);
+//     const { access_token, expires_in, refresh_token } = resultJson;
+//     localStorage.setItem("accessToken", access_token);
+//     localStorage.setItem("expiresIn", expires_in);
+//     localStorage.setItem("refreshToken", refresh_token);
+//     return access_token;
+// };
+
+// export const getRefreshToken = async () => {
+//     const refreshToken = localStorage.getItem("refreshToken");
+
+//     const params = new URLSearchParams();
+//     params.append("grant_type", "refresh_token");
+//     params.append("refresh_token", refreshToken);
+//     params.append("client_id", clientId);
+//     //Prepare to store expire date for token
+//     let expireDate = new Date();
+
+//     const result = await fetch("https://accounts.spotify.com/api/token", {
+//         method: "POST",
+//         headers: { 
+//             "Content-Type": "application/x-www-form-urlencoded",
+//         },
+//         body: params
+//     });
+//     //Check status of result, if 4xx reject
+
+//     // console.log(result);
+//     const resultJson = await result.json();
+//     // console.log(resultJson);
+//     const { access_token, expires_in, refresh_token } = resultJson;
+//     expireDate.setSeconds(expireDate.getSeconds() + parseInt(expires_in));
+//     localStorage.setItem("accessToken", access_token);
+//     localStorage.setItem("expiresDate", expireDate);
+//     localStorage.setItem("refreshToken", refresh_token);
+//     return access_token;
+// };
 
 const generateCodeVerifier = length => {
     let text = '';

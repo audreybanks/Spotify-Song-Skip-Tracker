@@ -17,7 +17,7 @@ import {
 } from "@aws-amplify/ui-react";
 import { generateClient } from 'aws-amplify/api';
 import { uploadData, getUrl, remove }  from 'aws-amplify/storage';
-import { redirectToAuth, getAccessToken, handleAuth } from "./authHelpers";
+import { handleAuth, getRefreshToken } from "./authHelpers";
 
 const client = generateClient();
 
@@ -31,15 +31,15 @@ const client = generateClient();
 // } else {
 //   accessToken = await getAccessToken(clientId, code);
 // }
+// let accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
+if (localStorage.getItem("accessToken") === 'undefined') {
+  handleAuth();
+}
 
 const App = ({ signOut }) => {
-  //TODO useState accessToken to check when accessToken aquired
-  let accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
-  if (!accessToken) {
-    handleAuth();
-  }
-  // TODO store time expires and check if expires is true
-  console.log(accessToken);
+  //TODO eventListener useState accessToken to check when accessToken aquired
+  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
+
   return (
     <ThemeProvider>
       <View className="App">
