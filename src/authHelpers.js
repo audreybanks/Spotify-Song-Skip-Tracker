@@ -1,5 +1,4 @@
 const clientId = "e6fb6e00e14f4df2b11fd3c6bd3985f3";
-// let accessToken = localStorage.getItem("accessToken") == 'undefined' ? null : localStorage.getItem("accessToken");
 
 export const handleAuth = async isRefresh => {
     const params = new URLSearchParams(window.location.search);
@@ -7,20 +6,22 @@ export const handleAuth = async isRefresh => {
     if (isRefresh) {
         getToken(clientId, code, true);
     } else if (!code) {
-        //TODO: Fix having to clikc button again to get access token cause of not calling getToken after
         redirectToAuth(clientId);
     } else {
         await getToken(clientId, code);
     }
-    //get Promise back from getAccessToken and handle setting/rejection here
+    // TODO get Promise back from getAccessToken and handle setting/rejection here
 }
 
 export const redirectToAuth = async (clientId) => {
     const verifier = generateCodeVerifier(128);
     const code = await generateCodeChallenge(verifier);
+    const state = generateCodeVerifier(16);
 
     localStorage.setItem("verifier", verifier);
+    localStorage.setItem("state", state);
 
+    // Add params for authorization request to Spotify. Ideally should only have to do once
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
@@ -28,6 +29,7 @@ export const redirectToAuth = async (clientId) => {
     params.append("scope", "user-read-private user-read-email");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", code);
+    params.append("state", state); // when redirect, remember if authorized
 
     document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
 };
@@ -74,8 +76,6 @@ export const getToken = async (clientId, code, isRefresh = false) => {
         window.dispatchEvent(tokenEvent);
     }
 }
-
-// TODO make a Promise to reject on error
 
 const generateCodeVerifier = length => {
     let text = '';

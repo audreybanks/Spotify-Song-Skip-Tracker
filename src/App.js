@@ -1,5 +1,3 @@
-// Put your code below this line.
-
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import SpotifyProfile from "./SpotifyProfile";
@@ -20,10 +18,20 @@ import { uploadData, getUrl, remove }  from 'aws-amplify/storage';
 import { handleAuth } from "./authHelpers";
 
 const client = generateClient();
+const params = new URLSearchParams(window.location.search);
+const state = params.get("state");
+
+// If state exists in params, matches stored state, and accessToken doesn't exist, retrieve access token
+if (state === localStorage.getItem("state") && 
+  (localStorage.getItem("accessToken") === 'undefined' || localStorage.getItem("accessToken") === null)) {
+  handleAuth();
+}
 
 const App = ({ signOut }) => {
-  //TODO eventListener useState accessToken to check when accessToken aquired
-  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
+  const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") === 'undefined' 
+    ? null : localStorage.getItem("accessToken"));
+
+  // Event listener to check if access token has been retrieved/changed, if so update the above variable
   useEffect(() => {
     const updateToken = () => {
       setAccessToken(localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken"));
@@ -31,11 +39,11 @@ const App = ({ signOut }) => {
 
     window.addEventListener("tokenUpdate", updateToken);
 
-    return () => {
+    return () => { // clean up event listener when component destroyed
       window.removeEventListener("tokenUpdate", updateToken);
     }
   }, []);
-  // const accessToken = localStorage.getItem("accessToken") === 'undefined' ? null : localStorage.getItem("accessToken");
+
   return (
     <ThemeProvider>
       <View className="App">
