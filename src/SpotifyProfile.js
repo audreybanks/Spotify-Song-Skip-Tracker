@@ -37,7 +37,7 @@ const SpotifyProfile = token => {
 };
 
 const getProfileData = async token => {
-    //check if token is expired before each API call
+    // check if token is expired before each API call
     const expiresDate = new Date(Date.parse(localStorage.getItem("expiresDate")));
     if (Date.now() > expiresDate) {
         handleAuth(true);
