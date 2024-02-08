@@ -15,16 +15,22 @@ import {
 } from "@aws-amplify/ui-react";
 import { generateClient } from 'aws-amplify/api';
 import { uploadData, getUrl, remove }  from 'aws-amplify/storage';
-import { handleAuth } from "./authHelpers";
+import { handleAuth } from "./apiHelpers";
 
 const client = generateClient();
 const params = new URLSearchParams(window.location.search);
 const state = params.get("state");
+let fetchError = false;
 
 // If state exists in params, matches stored state, and accessToken doesn't exist, retrieve access token
 if (state === localStorage.getItem("state") && 
   (localStorage.getItem("accessToken") === 'undefined' || localStorage.getItem("accessToken") === null)) {
-  handleAuth();
+  try {
+    await handleAuth();
+  } catch (err) {
+    fetchError = true;
+    console.log(err);
+  }
 }
 
 const App = ({ signOut }) => {
@@ -44,6 +50,8 @@ const App = ({ signOut }) => {
     }
   }, []);
 
+
+  // TODO: create proper error component
   return (
     <ThemeProvider>
       <View className="App">
@@ -53,6 +61,9 @@ const App = ({ signOut }) => {
         }
         { accessToken &&
               <SpotifyProfile token={accessToken} />
+        }
+        { fetchError &&
+              <Text>Error fecthing data, try again.</Text>
         }
       </View>
     </ThemeProvider>
