@@ -1,16 +1,32 @@
 const clientId = "e6fb6e00e14f4df2b11fd3c6bd3985f3";
+const RETRY_COUNT = 3;
 
 export const handleAuth = async isRefresh => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     if (isRefresh) {
-        getToken(clientId, code, true);
+        await tokenFetchRetry(clientId, code, 1, true);
     } else if (!code) {
         redirectToAuth(clientId);
     } else {
-        await getToken(clientId, code);
+        try {
+            await tokenFetchRetry(clientId, code, 1);
+        } catch (err) {
+            throw err;
+        }
     }
-    // TODO get Promise back from getAccessToken and handle setting/rejection here
+}
+
+const tokenFetchRetry = async (clientId, code, retryCount, isRefresh = false) => {
+    try {
+        await getToken(clientId, code, isRefresh);
+    } catch (err) {
+        if (retryCount === RETRY_COUNT) {
+            throw err;
+        } else {
+            await tokenFetchRetry(clientId, code, retryCount + 1, isRefresh);
+        }
+    }
 }
 
 export const redirectToAuth = async (clientId) => {
@@ -63,19 +79,25 @@ export const getToken = async (clientId, code, isRefresh = false) => {
         body: params
     });
 
-    const resultJson = await result.json();
+    if (result.ok) {
+        const resultJson = await result.json();
+    
 
-    const { access_token, expires_in, refresh_token } = resultJson;
-    if (!resultJson.error) {
+        const { access_token, expires_in, refresh_token } = resultJson;
         expireDate.setSeconds(expireDate.getSeconds() + parseInt(expires_in));
         localStorage.setItem("accessToken", access_token);
         localStorage.setItem("expiresDate", expireDate);
         localStorage.setItem("refreshToken", refresh_token);
-
+    
         const tokenEvent = new Event("tokenUpdate");
         window.dispatchEvent(tokenEvent);
+    } else {
+        // if fetching accesToken fails, throw error and return error json
+        throw new Error("Error fetching access token", { cause: result.json.error });
     }
 }
+
+// TODO make general fetch function to call from other components and handle errors there
 
 const generateCodeVerifier = length => {
     let text = '';
