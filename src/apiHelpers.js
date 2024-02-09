@@ -15,7 +15,7 @@ export const handleAuth = async isRefresh => {
             throw err;
         }
     }
-}
+};
 
 const tokenFetchRetry = async (clientId, code, retryCount, isRefresh = false) => {
     try {
@@ -27,7 +27,7 @@ const tokenFetchRetry = async (clientId, code, retryCount, isRefresh = false) =>
             await tokenFetchRetry(clientId, code, retryCount + 1, isRefresh);
         }
     }
-}
+};
 
 export const redirectToAuth = async (clientId) => {
     const verifier = generateCodeVerifier(128);
@@ -81,8 +81,6 @@ export const getToken = async (clientId, code, isRefresh = false) => {
 
     if (result.ok) {
         const resultJson = await result.json();
-    
-
         const { access_token, expires_in, refresh_token } = resultJson;
         expireDate.setSeconds(expireDate.getSeconds() + parseInt(expires_in));
         localStorage.setItem("accessToken", access_token);
@@ -95,9 +93,29 @@ export const getToken = async (clientId, code, isRefresh = false) => {
         // if fetching accesToken fails, throw error and return error json
         throw new Error("Error fetching access token", { cause: result.json.error });
     }
-}
+};
 
-// TODO make general fetch function to call from other components and handle errors there
+export const fetchAPI = async (resource, options, retryCount) => {
+    const expiresDate = new Date(Date.parse(localStorage.getItem("expiresDate")));
+    if (Date.now() > expiresDate) {
+        try {
+            await handleAuth(true);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const result = await fetch(resource, options);
+
+    if (result.ok) {
+        return result.json();
+    } else if (retryCount === RETRY_COUNT) {
+        console.log(result.json().error)
+        throw new Error("Error fetching data, try again");
+    } else {
+        await fetchAPI(resource, options, retryCount + 1);
+    }
+};
 
 const generateCodeVerifier = length => {
     let text = '';

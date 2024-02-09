@@ -11,7 +11,7 @@ import {
   withAuthenticator,
   ThemeProvider,
 } from "@aws-amplify/ui-react";
-import { handleAuth } from "./apiHelpers";
+import { handleAuth, fetchAPI } from "./apiHelpers";
 
 let fetchError = false;
 
@@ -19,13 +19,14 @@ const SpotifyProfile = token => {
     const [profile, setProfile] = useState();
 
     useEffect(() => {
-        getProfileData(token).then(data => {
-            if (!data.error) {
+        try {
+            getProfileData(token).then(data => {
                 setProfile(data);
-            } else if (data.error.status === '401') {
-                localStorage.setItem("accessToken", null);
-            }
-        });
+            });
+        } catch (err) {
+            fetchError = true;
+            console.log(err);
+        }
     }, [token]);
 
     return (
@@ -43,23 +44,12 @@ const SpotifyProfile = token => {
 };
 
 const getProfileData = async token => {
-    //TODO include this in the generic fetch function
-    // check if token is expired before each API call
-    const expiresDate = new Date(Date.parse(localStorage.getItem("expiresDate")));
-    if (Date.now() > expiresDate) {
-        try {
-            await handleAuth(true);
-          } catch (err) {
-            fetchError = true;
-            console.log(err);
-          }
-    }
+    const options = {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token.token}` },
+    };
 
-    const result = await fetch("https://api.spotify.com/v1/me", {
-        method: "GET", headers: { Authorization: `Bearer ${token.token}` }
-    });
-
-    const profileData = await result.json();
+    const profileData = await fetchAPI("https://api.spotify.com/v1/me", options, 1);
     return profileData;
 };
 
