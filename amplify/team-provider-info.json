@@ -17,9 +17,6 @@
       },
       "storage": {
         "imageStorage": {}
-      },
-      "api": {
-        "spotifysongskiptrack": {}
       }
     }
   }
