@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import Login from './Login';
+import SpotifyProfile from './SpotifyProfile';
 import reportWebVitals from './reportWebVitals';
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
@@ -13,11 +15,25 @@ const root = ReactDOM.createRoot(
   document.getElementById('root')
 );
 
+console.log("test");
+
+//TODO make proper error page in Issue 8
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<App />} />
+    <Route 
+      path="/" 
+      element={<App/>}
+      errorElement={<div>Error Page</div>}
+    > 
+      <Route path='login' element={<Login/>} />
+      <Route path="profile" element={<SpotifyProfile/>} />
+  </Route>
   )
 );
+
+// const router2 = createBrowserRouter(
+
+// )
 
 root.render(
   <React.StrictMode>

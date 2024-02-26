@@ -18,6 +18,7 @@ let fetchError = false;
 const SpotifyProfile = token => {
     const [profile, setProfile] = useState();
 
+
     useEffect(() => {
         try {
             getProfileData(token).then(data => {

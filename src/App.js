@@ -16,6 +16,7 @@ import {
 import { generateClient } from 'aws-amplify/api';
 import { uploadData, getUrl, remove }  from 'aws-amplify/storage';
 import { handleAuth } from "./apiHelpers";
+import { redirect, Outlet } from "react-router-dom";
 
 const client = generateClient();
 const params = new URLSearchParams(window.location.search);
@@ -55,8 +56,9 @@ const App = ({ signOut }) => {
   return (
     <ThemeProvider>
       <View className="App">
-        <Heading level={1}>Spotify Profile Test</Heading>
-        { !accessToken &&
+        {/* <Heading level={1}>Spotify Profile Test</Heading> */}
+        <Outlet/>
+        {/* { !accessToken &&
           <Button onClick={() => { handleAuth() }}>Sign into Spotify</Button>
         }
         { accessToken &&
@@ -64,7 +66,7 @@ const App = ({ signOut }) => {
         }
         { fetchError &&
               <Text>Error fecthing data, try again.</Text>
-        }
+        } */}
       </View>
     </ThemeProvider>
   );
