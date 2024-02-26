@@ -117,6 +117,11 @@ export const fetchAPI = async (resource, options, retryCount) => {
     }
 };
 
+export const getAccessToken = () => {
+    return localStorage.getItem("accessToken") === 'undefined' 
+    ? null : localStorage.getItem("accessToken");
+};
+
 const generateCodeVerifier = length => {
     let text = '';
     let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

@@ -13,14 +13,16 @@ import {
   ThemeProvider,
 } from "@aws-amplify/ui-react";
 import { handleAuth } from "./apiHelpers";
-import { redirect } from "react-router-dom";
+import { redirect, useLoaderData } from "react-router-dom";
 
 const Login = ({ signOut }) => {
+
+    console.log(useLoaderData());
 
     return (
         <ThemeProvider>
             <View className="Login">
-                <Text>Test Login</Text>
+                <Text>Login Page</Text>
             </View>
         </ThemeProvider>
     );

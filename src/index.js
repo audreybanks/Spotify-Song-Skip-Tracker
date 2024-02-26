@@ -8,14 +8,13 @@ import reportWebVitals from './reportWebVitals';
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
 import  { createBrowserRouter, createRoutesFromElements, RouterProvider , Route} from 'react-router-dom';
+import { getAccessToken } from './apiHelpers';
 Amplify.configure(config);
 
 
 const root = ReactDOM.createRoot(
   document.getElementById('root')
 );
-
-console.log("test");
 
 //TODO make proper error page in Issue 8
 const router = createBrowserRouter(
@@ -25,8 +24,9 @@ const router = createBrowserRouter(
       element={<App/>}
       errorElement={<div>Error Page</div>}
     > 
-      <Route path='login' element={<Login/>} />
-      <Route path="profile" element={<SpotifyProfile/>} />
+      <Route index element={<>Home</>} />
+      <Route path='login' element={<Login/>} loader={getAccessToken} />
+      <Route path="profile" element={<SpotifyProfile token={getAccessToken()}/>} />
   </Route>
   )
 );

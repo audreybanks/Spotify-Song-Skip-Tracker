@@ -18,7 +18,6 @@ let fetchError = false;
 const SpotifyProfile = token => {
     const [profile, setProfile] = useState();
 
-
     useEffect(() => {
         try {
             getProfileData(token).then(data => {
@@ -32,6 +31,7 @@ const SpotifyProfile = token => {
 
     return (
         <View>
+            Test
             {(profile && !profile.error) &&             <View>
                 <Heading level={3}>{profile.display_name}'s Profile</Heading>
                 <Text>User ID: {profile.id}</Text>
