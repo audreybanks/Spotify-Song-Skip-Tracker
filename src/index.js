@@ -26,14 +26,10 @@ const router = createBrowserRouter(
     > 
       <Route index element={<>Home</>} />
       <Route path='login' element={<Login/>} loader={getAccessToken} />
-      <Route path="profile" element={<SpotifyProfile token={getAccessToken()}/>} />
+      <Route path="profile" element={<SpotifyProfile/>} />
   </Route>
   )
 );
-
-// const router2 = createBrowserRouter(
-
-// )
 
 root.render(
   <React.StrictMode>

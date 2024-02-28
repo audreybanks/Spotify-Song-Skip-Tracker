@@ -13,16 +13,25 @@ import {
   ThemeProvider,
 } from "@aws-amplify/ui-react";
 import { handleAuth } from "./apiHelpers";
-import { redirect, useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 
 const Login = ({ signOut }) => {
 
-    console.log(useLoaderData());
+    const navigate = useNavigate();
+    const accessToken = useLoaderData();
+
+    useEffect(() => {
+        if (accessToken) {
+            console.log("accessToken Found");
+            navigate("/profile");
+        }
+    }, [navigate, accessToken]);
 
     return (
         <ThemeProvider>
             <View className="Login">
                 <Text>Login Page</Text>
+                <Button onClick={() => { handleAuth() }}>Sign into Spotify</Button>
             </View>
         </ThemeProvider>
     );
