@@ -15,24 +15,13 @@ import {
 } from "@aws-amplify/ui-react";
 import { generateClient } from 'aws-amplify/api';
 import { uploadData, getUrl, remove }  from 'aws-amplify/storage';
-import { getAccessToken, handleAuth } from "./apiHelpers";
+import { getAccessToken } from "./apiHelpers";
 import { useNavigate, Outlet, Link } from "react-router-dom";
 
 const client = generateClient();
 const params = new URLSearchParams(window.location.search);
 const state = params.get("state");
 let fetchError = false;
-
-// If state exists in params, matches stored state, and accessToken doesn't exist, retrieve access token
-if (state === localStorage.getItem("state") && 
-  (localStorage.getItem("accessToken") === 'undefined' || localStorage.getItem("accessToken") === null)) {
-  try {
-    await handleAuth();
-  } catch (err) {
-    fetchError = true;
-    console.log(err);
-  }
-}
 
 const App = ({ signOut }) => {
 

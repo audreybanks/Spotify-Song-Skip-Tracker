@@ -12,8 +12,18 @@ import {
   withAuthenticator,
   ThemeProvider,
 } from "@aws-amplify/ui-react";
-import { handleAuth } from "./apiHelpers";
+import { getAccessToken, handleAuth } from "./apiHelpers";
 import { useLoaderData, useNavigate } from "react-router-dom";
+
+// If state exists in params, matches stored state, and accessToken doesn't exist, retrieve access token
+if (state === localStorage.getItem("state") && getAccessToken()) {
+  try {
+    await handleAuth();
+  } catch (err) {
+    fetchError = true;
+    console.log(err);
+  }
+}
 
 const Login = ({ signOut }) => {
 
