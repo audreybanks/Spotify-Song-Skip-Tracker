@@ -11,26 +11,34 @@ import {
   withAuthenticator,
   ThemeProvider,
 } from "@aws-amplify/ui-react";
-import { handleAuth, fetchAPI } from "./apiHelpers";
+import { fetchAPI, getAccessToken } from "./apiHelpers";
+import { useNavigate } from "react-router-dom";
 
 let fetchError = false;
 
-const SpotifyProfile = token => {
+const SpotifyProfile = () => {
     const [profile, setProfile] = useState();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (!getAccessToken()) {
+            navigate("/login");
+            return;
+        }
+
         try {
-            getProfileData(token).then(data => {
+            getProfileData().then(data => {
                 setProfile(data);
             });
         } catch (err) {
             fetchError = true;
             console.log(err);
         }
-    }, [token]);
+    }, [navigate]);
 
     return (
         <View>
+            Test
             {(profile && !profile.error) &&             <View>
                 <Heading level={3}>{profile.display_name}'s Profile</Heading>
                 <Text>User ID: {profile.id}</Text>
@@ -43,10 +51,10 @@ const SpotifyProfile = token => {
     );
 };
 
-const getProfileData = async token => {
+const getProfileData = async () => {
     const options = {
         method: "GET",
-        headers: { Authorization: `Bearer ${token.token}` },
+        headers: { Authorization: `Bearer ${getAccessToken()}` },
     };
 
     const profileData = await fetchAPI("https://api.spotify.com/v1/me", options, 1);

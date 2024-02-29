@@ -41,7 +41,7 @@ export const redirectToAuth = async (clientId) => {
     const params = new URLSearchParams();
     params.append("client_id", clientId);
     params.append("response_type", "code");
-    params.append("redirect_uri", "http://localhost:3000");
+    params.append("redirect_uri", "http://localhost:3000/profile");
     params.append("scope", "user-read-private user-read-email");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", code);
@@ -67,7 +67,7 @@ export const getToken = async (clientId, code, isRefresh = false) => {
         params.append("client_id", clientId);
         params.append("grant_type", "authorization_code");
         params.append("code", code);
-        params.append("redirect_uri", "http://localhost:3000");
+        params.append("redirect_uri", "http://localhost:3000/profile");
         params.append("code_verifier", verifier);
     }
 
@@ -115,6 +115,11 @@ export const fetchAPI = async (resource, options, retryCount) => {
     } else {
         await fetchAPI(resource, options, retryCount + 1);
     }
+};
+
+export const getAccessToken = () => {
+    return localStorage.getItem("accessToken") === 'undefined' 
+    ? null : localStorage.getItem("accessToken");
 };
 
 const generateCodeVerifier = length => {
