@@ -2,9 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import Login from './Login';
+import SpotifyProfile from './SpotifyProfile';
 import reportWebVitals from './reportWebVitals';
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
+import  { createBrowserRouter, createRoutesFromElements, RouterProvider , Route} from 'react-router-dom';
+import { getAccessToken } from './apiHelpers';
 Amplify.configure(config);
 
 
@@ -12,9 +16,24 @@ const root = ReactDOM.createRoot(
   document.getElementById('root')
 );
 
+//TODO make proper error page in Issue 8
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route 
+      path="/" 
+      element={<App/>}
+      errorElement={<div>Error Page</div>}
+    > 
+      <Route index element={<>Home</>} />
+      <Route path='login' element={<Login/>} loader={getAccessToken} />
+      <Route path="profile" element={<SpotifyProfile/>} />
+  </Route>
+  )
+);
+
 root.render(
   <React.StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
 
