@@ -2,13 +2,17 @@ const clientId = "e6fb6e00e14f4df2b11fd3c6bd3985f3";
 const RETRY_COUNT = 3;
 
 export const handleAuth = async isRefresh => {
+    // console.log("handleAuth");
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
+    console.log("handleAuth");
     if (isRefresh) {
         await tokenFetchRetry(clientId, code, 1, true);
     } else if (!code) {
+        console.log("handleAuth2");
         redirectToAuth(clientId);
     } else {
+        console.log("handleAuth3");
         try {
             await tokenFetchRetry(clientId, code, 1);
         } catch (err) {
@@ -42,7 +46,7 @@ export const redirectToAuth = async (clientId) => {
     params.append("client_id", clientId);
     params.append("response_type", "code");
     params.append("redirect_uri", "http://localhost:3000/profile");
-    params.append("scope", "user-read-private user-read-email");
+    params.append("scope", "user-read-private user-read-email user-read-playback-state");
     params.append("code_challenge_method", "S256");
     params.append("code_challenge", code);
     params.append("state", state); // when redirect, remember if authorized
@@ -79,9 +83,11 @@ export const getToken = async (clientId, code, isRefresh = false) => {
         body: params
     });
 
+    console.log("getToken");
     if (result.ok) {
         const resultJson = await result.json();
         const { access_token, expires_in, refresh_token } = resultJson;
+        console.log(access_token);
         expireDate.setSeconds(expireDate.getSeconds() + parseInt(expires_in));
         localStorage.setItem("accessToken", access_token);
         localStorage.setItem("expiresDate", expireDate);
@@ -108,9 +114,11 @@ export const fetchAPI = async (resource, options, retryCount) => {
     const result = await fetch(resource, options);
 
     if (result.ok) {
-        return result.json();
+        return result;
     } else if (retryCount === RETRY_COUNT) {
-        console.log(result.json().error)
+        result.json().then(resultJson => {
+            console.log(resultJson);
+        });
         throw new Error("Error fetching data, try again");
     } else {
         await fetchAPI(resource, options, retryCount + 1);
