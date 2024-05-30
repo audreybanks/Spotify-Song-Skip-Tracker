@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 import Login from './Login';
 import SpotifyProfile from './SpotifyProfile';
+import NotFoundPage from './NotFoundPage';
 import reportWebVitals from './reportWebVitals';
 import { Amplify } from 'aws-amplify';
 import config from './aws-exports';
@@ -22,7 +23,7 @@ const router = createBrowserRouter(
     <Route 
       path="/" 
       element={<App/>}
-      errorElement={<div>Error Page</div>}
+      errorElement={<NotFoundPage/>}
     > 
       <Route index element={<>Home</>} />
       <Route path='login' element={<Login/>} loader={getAccessToken} />

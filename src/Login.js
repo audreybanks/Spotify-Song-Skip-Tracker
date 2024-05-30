@@ -16,14 +16,14 @@ import { getAccessToken, handleAuth } from "./apiHelpers";
 import { useLoaderData, useNavigate } from "react-router-dom";
 
 // If state exists in params, matches stored state, and accessToken doesn't exist, retrieve access token
-if (state === localStorage.getItem("state") && getAccessToken()) {
-  try {
-    await handleAuth();
-  } catch (err) {
-    fetchError = true;
-    console.log(err);
-  }
-}
+// if (state === localStorage.getItem("state") && getAccessToken()) {
+//   try {
+//     await handleAuth();
+//   } catch (err) {
+//     fetchError = true;
+//     console.log(err);
+//   }
+// }
 
 const Login = ({ signOut }) => {
 
@@ -34,6 +34,8 @@ const Login = ({ signOut }) => {
         if (accessToken) {
             console.log("accessToken Found");
             navigate("/profile");
+        } else if (localStorage.getItem("state")) {
+            handleAuth();
         }
     }, [navigate, accessToken]);
 

@@ -23,8 +23,8 @@ const params = new URLSearchParams(window.location.search);
 const state = params.get("state");
 let fetchError = false;
 
-const App = ({ signOut }) => {
-
+const App = () => {
+  const [accessToken, setAccessToken] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,4 +43,4 @@ const App = ({ signOut }) => {
   );
 };
 
-export default withAuthenticator(App);
+export default App;

@@ -11,14 +11,20 @@ import {
   withAuthenticator,
   ThemeProvider,
 } from "@aws-amplify/ui-react";
-import { fetchAPI, getAccessToken } from "./apiHelpers";
+import { handleAuth, fetchAPI, getAccessToken } from "./apiHelpers";
 import { useNavigate } from "react-router-dom";
 
 let fetchError = false;
 
 const SpotifyProfile = () => {
     const [profile, setProfile] = useState();
+    const [playerState, setPlayerState] = useState();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = "Your Profile"
+        getPlayerState();
+    }, [])
 
     useEffect(() => {
         if (!getAccessToken()) {
@@ -57,8 +63,28 @@ const getProfileData = async () => {
         headers: { Authorization: `Bearer ${getAccessToken()}` },
     };
 
-    const profileData = await fetchAPI("https://api.spotify.com/v1/me", options, 1);
-    return profileData;
+    const profileData = await fetchAPI("https://api.spotify.com/v1/me", options, 1).catch(error => {
+        console.log(error);
+        profileData.error = true;
+    });
+    return profileData.json();
+};
+
+const getPlayerState = async () => {
+    const options = {
+        method: "GET",
+        headers: { Authorization: `Bearer ${getAccessToken()}` },
+    }
+    const playerState = await fetchAPI("https://api.spotify.com/v1/me/player", options, 1).catch(error => {
+        console.log(error);
+    });
+    if (playerState.status === 200) {
+        let playerJson = await playerState.json();
+        console.log(playerJson);
+        return playerJson;
+    } else {
+        return "Error getting playback state."
+    }
 };
 
 export default SpotifyProfile;
